@@ -2,8 +2,17 @@
 ##### Your internet is fast as Potato? 
 ##### Use (R)Potato.Socket(tm)
 ## WTF is this?!
-Potato socket - is a WebSocket wrapper with built-in serialization/deserialization support backed by ProtoDef
+Potato.Socket - is a WebSocket wrapper with built-in serialization/deserialization support backed by ProtoDef
 
+## API
+|Method|Description|Example|
+|-|-|-|
+| Potato.addPacket | Adds packet to parser with schema (All ProtoDef/Rust types are supported) | `potato.addPacket({a:'string',b:'u8',c:'i64'})` |
+| Potato.finishDeclaration | Starts ProtoDef, allows to use on/emit/RPC | |
+| Potato.on | Attaches a event listener | |
+| Potato.emit | Emits a packet to server | |
+| Potato.* = ...| Adds a new method to RPC (Will be awaited on call) | |
+| Potato.*(...params) | Calls a method on RPC (Needs to be await, since a method is really on client side) ||
 
 ## Usage:
 ### Client:
