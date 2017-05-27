@@ -6,15 +6,42 @@ import AJSON from '@meteor-it/ajson';
 
 const potatoLogger=new Logger('potato');
 // Converts potato packet description to protodef acceptable
-function convertDescription(description) {
-    potatoLogger.debug('convertDescription  IN: ',description);
-    let data=[];
-    Object.keys(description).forEach(key=>{
-        data.push({
+
+function convertObj(data) {
+    let dataOut=[];
+    Object.keys(data).forEach(key=>{
+        dataOut.push({
             "name": key,
-            "type": description[key]
+            "type": convertAll(data[key])
         });
     });
+    return ["container", dataOut];
+}
+
+function convertArray(data){
+    if(data.length!==1)
+        throw new Error('Array can contain items only of one type!');
+    return [
+        "array",
+        {
+            "countType": "i32",
+            "type": data[0]
+        }
+    ];
+}
+
+function convertAll(data){
+    if(typeof data === 'string')
+        return data;
+    if(data instanceof Array)
+        return convertArray(data);
+    if(typeof data === 'object')
+        return convertObj(data);
+}
+
+function convertDescription(description) {
+    potatoLogger.debug('convertDescription  IN: ',description);
+    let data=convertAll(description);
     potatoLogger.debug('convertDescription OUT: ',data);
     return data;
 }
@@ -124,9 +151,7 @@ async function createPotatoSocket(socket) {
             id=id.toString(10);
             protocol.packet[1][0].type[1].mappings[id]=name;
             protocol.packet[1][1].type[1].fields[name]=name;
-            protocol[name]=[
-                "container", description
-            ];
+            protocol[name]=description;
             potatoLogger.debug('addPacket(id: %d, fieldCount: %d)',id,description.length);
         },
         finishDeclaration() {
