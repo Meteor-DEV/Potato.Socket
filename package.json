@@ -1,10 +1,15 @@
 {
   "name": "potato.socket",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "POTATO!",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies":{
+    "protodef": "latest",
+    "@meteor-it/logger":"latest",
+    "@meteor-it/platform":"latest"
   },
   "author": "f6cf",
   "license": "MIT"

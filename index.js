@@ -1,8 +1,6 @@
 import {ProtoDef, Serializer, Parser} from 'protodef';
 import Logger from '@meteor-it/logger';
 import {isBrowser} from '@meteor-it/platform';
-import * as crypto from 'crypto';
-import AJSON from '@meteor-it/ajson';
 
 const potatoLogger=new Logger('potato');
 // Converts potato packet description to protodef acceptable
@@ -76,7 +74,7 @@ function getSocketId() {
 //         return outChr.toString(16);
 //     });
 // }
-async function createPotatoSocket(socket) {
+export async function createPotatoSocket(socket) {
     let packetId=0;
     const protocol = {
         "container": "native",
@@ -122,14 +120,10 @@ async function createPotatoSocket(socket) {
             if (!target.declarationFinished)
                 return potatoLogger.error('emit(): Declaration of socket is not finished before usage! Call finishDeclaration before doing anything with socket!',new Error().stack);
             potatoLogger.debug('emit()');
-            try{
             serializer.write({
                 name: name,
                 params: data
             });
-            }catch(e){
-                console.log(e);
-            }
             potatoLogger.debug('/emit()');
         },
         eventListeners:{},
@@ -158,7 +152,6 @@ async function createPotatoSocket(socket) {
             if (target.declarationFinished)
                 return potatoLogger.error('finishDeclaration(): Socket declaration is already finished!');
             potatoLogger.log('Done declaration');
-            //console.log(JSON.stringify(protocol,null,4));
             proto.addTypes(protocol);
             potatoLogger.log('Done adding');
             parser = new Parser(proto, "packet");
@@ -173,12 +166,11 @@ async function createPotatoSocket(socket) {
                 });
             });
             serializer = new Serializer(proto, "packet");
-            serializer.on('data',(a,b,c)=>{
+            serializer.on('data',(a)=>{
                 socket.send(new Uint8Array(a).buffer); // Convert to arrayBuffer and send
             });
             socket.on('message',m=>{
-                console.log(m);
-                parser.write(new Buffer(m));
+                parser.write(new Buffer(m.data));
             });
             potatoLogger.log('Done finishing');
             target.declarationFinished = true;
